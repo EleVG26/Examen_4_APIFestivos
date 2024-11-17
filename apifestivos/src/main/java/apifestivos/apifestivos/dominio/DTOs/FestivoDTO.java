@@ -1,13 +1,13 @@
 package apifestivos.apifestivos.dominio.DTOs;
+
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
+
 
 public class FestivoDTO {
     
     private String nombre;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate fecha;
 
     // Constructor vacío
