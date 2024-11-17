@@ -58,8 +58,7 @@ buildNumber.properties
 *.class
 
 ### Configuración sensible ###
-application.properties
-*.env
+
 
 ### Logs ###
 *.log
