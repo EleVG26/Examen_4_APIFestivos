@@ -46,7 +46,7 @@ public class FestivoServicio implements IFestivoServicio {
                 );
 
                 if (fecha.equals(fechaFestivo)) {
-                    return "Es Festivo ";
+                    return "Es Festivo";
                 }
             }
 
