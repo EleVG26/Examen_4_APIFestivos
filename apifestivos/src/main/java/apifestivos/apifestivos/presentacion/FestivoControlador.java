@@ -24,15 +24,15 @@ public class FestivoControlador {
 
     @GetMapping("/verificar/{año}/{mes}/{dia}")
     public ResponseEntity<String> verificarFestivo(@PathVariable int año, @PathVariable int mes,
-            @PathVariable int dia) {
-        try {
-            LocalDate fecha = LocalDate.of(año, mes, dia);
-            String resultado = festivoServicio.verificarSiEsFestivo(fecha);
-            return ResponseEntity.ok(resultado);
-        } catch (DateTimeException e) {
-            return ResponseEntity.badRequest().body("Fecha no válida");
-        }
+        @PathVariable int dia) {
+    try {
+        LocalDate fecha = LocalDate.of(año, mes, dia);
+        String resultado = festivoServicio.verificarSiEsFestivo(fecha);
+        return ResponseEntity.ok(resultado);
+    } catch (DateTimeException e) {
+        return ResponseEntity.ok("Fecha no válida");
     }
+}
 
     @GetMapping("/{año}")
     public ResponseEntity<List<FestivoDTO>> obtenerFestivosPorAño(@PathVariable int año) {
