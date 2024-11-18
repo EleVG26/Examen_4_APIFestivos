@@ -1,5 +1,6 @@
 package apifestivos.apifestivos.dominio.entidades;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,51 +10,40 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidad que representa un festivo en la base de datos.
+ */
+
 @Entity
 @Table(name = "festivo")
 public class Festivo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
+    
 
-    private Integer dia;
-    private Integer mes;
-
-    @Column(name = "nombre") // Asegúrate de que el nombre sea correcto
     private String nombre;
+    private int dia;
+    private int mes;
 
-    @Column(name = "diaspascua") // Asegúrate de que el nombre coincida exactamente con el de la base de datos
-    private Integer diasPascua;
-
+    @Column(name = "diaspascua")
+    private int diasPascua;
+    
     @ManyToOne
-    @JoinColumn(name = "idtipo", nullable = false)
+    @JoinColumn(name = "idtipo",  nullable = false)
     private Tipo tipo;
 
+    
     public Festivo() {
     }
 
-    public Integer getId() {
+    // Getters and setters
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public Integer getDia() {
-        return dia;
-    }
-
-    public void setDia(Integer dia) {
-        this.dia = dia;
-    }
-
-    public Integer getMes() {
-        return mes;
-    }
-
-    public void setMes(Integer mes) {
-        this.mes = mes;
     }
 
     public String getNombre() {
@@ -64,11 +54,27 @@ public class Festivo {
         this.nombre = nombre;
     }
 
-    public Integer getDiasPascua() {
+    public int getDia() {
+        return dia;
+    }
+
+    public void setDia(int dia) {
+        this.dia = dia;
+    }
+
+    public int getMes() {
+        return mes;
+    }
+
+    public void setMes(int mes) {
+        this.mes = mes;
+    }
+
+    public int getDiasPascua() {
         return diasPascua;
     }
 
-    public void setDiasPascua(Integer diasPascua) {
+    public void setDiasPascua(int diasPascua) {
         this.diasPascua = diasPascua;
     }
 
@@ -79,7 +85,4 @@ public class Festivo {
     public void setTipo(Tipo tipo) {
         this.tipo = tipo;
     }
-
-    
-
 }

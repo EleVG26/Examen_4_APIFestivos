@@ -1,16 +1,17 @@
 package apifestivos.apifestivos.presentacion;
 
-import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import apifestivos.apifestivos.core.interfaces.servicios.IFestivoServicio;
-import apifestivos.apifestivos.dominio.DTOs.FestivoDTO;
+
+
+/**
+ * Controlador REST para manejar las solicitudes relacionadas con los festivos.
+ */
 
 @RestController
 @RequestMapping("/festivos")
@@ -18,25 +19,33 @@ public class FestivoControlador {
 
     private final IFestivoServicio festivoServicio;
 
+    /**
+     * Inyección de dependencias a través del constructor.
+     * @param festivoServicio Servicio de festivos para manejar la lógica de negocio.
+     */
     public FestivoControlador(IFestivoServicio festivoServicio) {
         this.festivoServicio = festivoServicio;
     }
 
-    @GetMapping("/verificar/{año}/{mes}/{dia}")
-    public ResponseEntity<String> verificarFestivo(@PathVariable int año, @PathVariable int mes,
-        @PathVariable int dia) {
-    try {
-        LocalDate fecha = LocalDate.of(año, mes, dia);
-        String resultado = festivoServicio.verificarSiEsFestivo(fecha);
-        return ResponseEntity.ok(resultado);
-    } catch (DateTimeException e) {
-        return ResponseEntity.ok("Fecha no válida");
-    }
-}
-
-    @GetMapping("/{año}")
-    public ResponseEntity<List<FestivoDTO>> obtenerFestivosPorAño(@PathVariable int año) {
-        List<FestivoDTO> festivos = festivoServicio.obtenerFestivosPorAño(año);
-        return ResponseEntity.ok(festivos);
+    /**
+     * Endpoint para verificar si una fecha es festiva.
+     * @param anio Año de la fecha a verificar.
+     * @param mes Mes de la fecha a verificar.
+     * @param dia Día de la fecha a verificar.
+     * @return Respuesta HTTP con el resultado de la verificación.
+     */
+    @GetMapping("/verificar/{anio}/{mes}/{dia}")
+    public ResponseEntity<String> verificarFestivo(@PathVariable int anio, @PathVariable int mes, @PathVariable int dia) {
+        try {
+            // Crear una instancia de LocalDate con los valores de año, mes y día
+            LocalDate fecha = LocalDate.of(anio, mes, dia);
+            
+            // Verificar si es festivo usando el servicio
+            String resultado = festivoServicio.verificarSiEsFestivo(fecha);
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            // Capturar cualquier excepción que ocurra (por ejemplo, fechas inválidas)
+            return ResponseEntity.ok("Fecha no válida");
+        }
     }
 }

@@ -1,14 +1,16 @@
 package apifestivos.apifestivos.dominio.DTOs;
-import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
+/**
+ * Clase DTO (Data Transfer Object) para representar un festivo.
+ * Utilizada para transferir información de festivos entre capas de la aplicación.
+ */
+
 
 public class FestivoDTO {
     
-    private String nombre;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate fecha;
+    private String nombre; // Nombre del festivo
+    private LocalDate fecha; // Fecha del festivo
 
     // Constructor vacío
     public FestivoDTO() {
