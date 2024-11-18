@@ -10,8 +10,7 @@ El proyecto sigue la arquitectura Onion y está dividido de la siguiente manera:
 - **core/interfaces**: Contiene las interfaces para los contratos:
   - **repositorios**: Interfaces que manejan la comunicación con la base de datos (`IFestivoRepositorio.java` y `ITipoRepositorio.java`).
   - **servicios**: Contratos de servicio (`IFestivoServicio.java`).
-- **dominio**: Contiene los elementos del negocio:
-  - **DTOs**: Objetos de transferencia de datos (`FestivoDTO.java`).
+- **dominio**: Contiene los elementos de la API:
   - **entidades**: Representan las tablas de la base de datos (`Festivo.java` y `Tipo.java`).
 - **presentacion**: Contiene los controladores que exponen los endpoints de la API (`FestivoControlador.java`).
 
