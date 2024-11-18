@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 @Table(name = "tipo")
 public class Tipo {
 
-   @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
@@ -40,5 +40,5 @@ public class Tipo {
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
-}
 
+}
