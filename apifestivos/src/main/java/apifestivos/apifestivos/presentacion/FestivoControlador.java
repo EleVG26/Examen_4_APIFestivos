@@ -1,6 +1,7 @@
 package apifestivos.apifestivos.presentacion;
 
-import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,11 +36,15 @@ public class FestivoControlador {
      * @return Respuesta HTTP con el resultado de la verificación.
      */
     @GetMapping("/verificar/{anio}/{mes}/{dia}")
-    public ResponseEntity<String> verificarFestivo(@PathVariable int anio, @PathVariable int mes, @PathVariable int dia) {
+    public ResponseEntity<String> verificarFestivo(@PathVariable int anio, @PathVariable int mes,
+            @PathVariable int dia) {
         try {
+            if (mes < 1 || mes > 12 || dia < 1 || dia > 31) {
+                return ResponseEntity.ok("Fecha no válida");
+            }
             // Crear una instancia de LocalDate con los valores de año, mes y día
-            LocalDate fecha = LocalDate.of(anio, mes, dia);
-            
+            Date fecha = new Date(anio - 1900, mes - 1, dia);
+
             // Verificar si es festivo usando el servicio
             String resultado = festivoServicio.verificarSiEsFestivo(fecha);
             return ResponseEntity.ok(resultado);
