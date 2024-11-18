@@ -1,5 +1,6 @@
 package apifestivos.apifestivos.dominio.entidades;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +10,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidad que representa un festivo en la base de datos.
+ */
+
 @Entity
 @Table(name = "festivo")
 public class Festivo {
@@ -16,6 +21,7 @@ public class Festivo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+
     private String nombre;
     private int dia;
     private int mes;

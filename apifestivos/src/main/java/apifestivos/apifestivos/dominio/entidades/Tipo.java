@@ -6,6 +6,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * Entidad que representa un tipo de festivo en la base de datos.
+ */
+
 @Entity
 @Table(name = "tipo")
 public class Tipo {
@@ -16,7 +20,6 @@ public class Tipo {
     
     private String tipo;
 
-    
     
     public Tipo() {
     }
