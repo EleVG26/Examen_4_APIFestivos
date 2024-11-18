@@ -1,12 +1,15 @@
 package apifestivos.apifestivos.aplicacion;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import apifestivos.apifestivos.core.interfaces.repositorios.IFestivoRepositorio;
 import apifestivos.apifestivos.core.interfaces.servicios.IFestivoServicio;
+
 import apifestivos.apifestivos.dominio.entidades.Festivo;
 
 /**
@@ -20,6 +23,7 @@ public class FestivoServicio implements IFestivoServicio {
 
     /**
      * Constructor que inyecta el repositorio de festivos.
+     * 
      * @param festivoRepositorio Repositorio para manejar la persistencia de los festivos.
      */
     public FestivoServicio(IFestivoRepositorio festivoRepositorio) {
@@ -28,10 +32,11 @@ public class FestivoServicio implements IFestivoServicio {
 
     /**
      * Verifica si una fecha determinada es un día festivo.
+     * 
      * @param fecha Fecha a verificar.
      * @return "Es Festivo" si la fecha corresponde a un día festivo, "No es festivo" si no, o "Fecha no válida" si la fecha es incorrecta.
      */
-
+    @Override
     public String verificarSiEsFestivo(Date fecha) {
         try {
             // Validar que la fecha no sea nula y que sea válida
@@ -39,23 +44,31 @@ public class FestivoServicio implements IFestivoServicio {
                 return "Fecha no válida";
             }
 
+            // Obtener el año de la fecha ingresada
             Calendar cal = Calendar.getInstance();
             cal.setTime(fecha);
             int anio = cal.get(Calendar.YEAR);
 
+            // Obtener todos los festivos
             List<Festivo> festivos = festivoRepositorio.findAll();
             // Iterar sobre cada festivo para verificar si coincide con la fecha
             for (Festivo festivo : festivos) {
-                Date fechaFestivo = calcularFechaFestivo(
-                        festivo.getTipo().getId(),
-                        festivo.getDia(),
-                        festivo.getMes(),
-                        festivo.getDiasPascua(),
-                        anio
-                );
+                Date fechaFestivo;
+                try {
+                    fechaFestivo = calcularFechaFestivo(
+                            festivo.getTipo().getId(),
+                            festivo.getDia(),
+                            festivo.getMes(),
+                            festivo.getDiasPascua(),
+                            anio);
+                } catch (IllegalArgumentException e) {
+                    // Fecha de festivo inválida, continuar con el siguiente
+                    continue;
+                }
+
                 // Comparar la fecha ingresada con la fecha del festivo
-                if (fecha.equals(fechaFestivo)) {
-                    return "Es Festivo";
+                if (mismasFechasSinHora(fecha, fechaFestivo)) {
+                    return "Es Festivo ";
                 }
             }
 
@@ -66,22 +79,34 @@ public class FestivoServicio implements IFestivoServicio {
             return "Error interno del servidor: " + e.getMessage();
         }
     }
-    
-    
+
     /**
      * Valida si una fecha es válida.
+     * 
      * @param fecha Fecha a validar.
      * @return True si la fecha es válida, false en caso contrario.
      */
-
     private boolean esFechaValida(Date fecha) {
+        if (fecha == null) {
+            return false;
+        }
         Calendar cal = Calendar.getInstance();
+        cal.setLenient(false); // Establecer leniencia a false
         cal.setTime(fecha);
-        return fecha != null && cal.get(Calendar.YEAR) > 0;
+        try {
+            // Verificar que el año, mes y día sean válidos
+            cal.get(Calendar.YEAR);
+            cal.get(Calendar.MONTH);
+            cal.get(Calendar.DAY_OF_MONTH);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
      * Calcula la fecha de un festivo según su tipo.
+     * 
      * @param tipoFestivo Tipo de festivo (fijo, que se traslada, etc.).
      * @param dia Día del mes del festivo.
      * @param mes Mes del festivo.
@@ -89,7 +114,6 @@ public class FestivoServicio implements IFestivoServicio {
      * @param anio Año del que se quiere calcular el festivo.
      * @return Fecha del festivo calculada.
      */
-
     private Date calcularFechaFestivo(int tipoFestivo, Integer dia, Integer mes, Integer diasPascua, int anio) {
         Date fechaFestivo;
         Date fechaPascua;
@@ -97,12 +121,12 @@ public class FestivoServicio implements IFestivoServicio {
         switch (tipoFestivo) {
             case 1:
                 // Festivo fijo que no se traslada
-                fechaFestivo = new Date(anio - 1900, mes - 1, dia);
+                fechaFestivo = crearFecha(anio, mes, dia);
                 break;
 
             case 2:
                 // Festivo fijo que se traslada al siguiente lunes (Ley de Puente Festivo)
-                fechaFestivo = new Date(anio - 1900, mes - 1, dia);
+                fechaFestivo = crearFecha(anio, mes, dia);
                 fechaFestivo = siguienteLunes(fechaFestivo);
                 break;
 
@@ -127,12 +151,35 @@ public class FestivoServicio implements IFestivoServicio {
     }
 
     /**
+     * Crea una fecha a partir de año, mes y día, validando que sea correcta.
+     * 
+     * @param anio Año.
+     * @param mes  Mes.
+     * @param dia  Día.
+     * @return Objeto Date con la fecha especificada.
+     * @throws IllegalArgumentException Si la fecha es inválida.
+     */
+    private Date crearFecha(int anio, int mes, int dia) throws IllegalArgumentException {
+        Calendar cal = Calendar.getInstance();
+        cal.setLenient(false); // Establecer leniencia a false
+        cal.clear();
+        cal.set(Calendar.YEAR, anio);
+        cal.set(Calendar.MONTH, mes - 1); // Meses van de 0 a 11
+        cal.set(Calendar.DAY_OF_MONTH, dia);
+        try {
+            return cal.getTime();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Fecha inválida: " + dia + "/" + mes + "/" + anio);
+        }
+    }
+
+    /**
      * Calcula la fecha del Domingo de Pascua para un año dado.
+     * 
      * @param anio Año del que se quiere calcular la fecha de Pascua.
      * @return Fecha del Domingo de Pascua.
      */
-    
-     public Date getDomingoDePascua(int anio) {
+    public Date getDomingoDePascua(int anio) {
         int a = anio % 19;
         int b = anio / 100;
         int c = anio % 100;
@@ -148,13 +195,14 @@ public class FestivoServicio implements IFestivoServicio {
         int mes = (h + l - 7 * m + 114) / 31;
         int dia = ((h + l - 7 * m + 114) % 31) + 1;
 
-        return new Date(anio - 1900, mes - 1, dia);
+        return crearFecha(anio, mes, dia);
     }
 
     /**
      * Incrementa una fecha en una cantidad de días dada.
+     * 
      * @param fecha Fecha inicial.
-     * @param dias Días a incrementar.
+     * @param dias  Días a incrementar.
      * @return Fecha incrementada.
      */
     public static Date incrementarDias(Date fecha, int dias) {
@@ -162,11 +210,11 @@ public class FestivoServicio implements IFestivoServicio {
         cld.setTime(fecha);
         cld.add(Calendar.DATE, dias);
         return cld.getTime();
-
     }
 
     /**
      * Calcula el siguiente lunes de una fecha dada.
+     * 
      * @param fecha Fecha de referencia.
      * @return Fecha del siguiente lunes.
      */
@@ -175,16 +223,30 @@ public class FestivoServicio implements IFestivoServicio {
         cld.setTime(fecha);
 
         int diaSemana = cld.get(Calendar.DAY_OF_WEEK);
-        if (diaSemana != Calendar.MONDAY) {
-            if (diaSemana > Calendar.MONDAY) {
-                fecha = incrementarDias(fecha, 9 - diaSemana);
-            } else {
-                fecha = incrementarDias(fecha, 1);
-            }
+        int diasParaLunes = ((Calendar.MONDAY - diaSemana + 7) % 7);
+        if (diasParaLunes == 0) {
+            diasParaLunes = 7;
         }
-
-        return fecha;
+        cld.add(Calendar.DATE, diasParaLunes);
+        return cld.getTime();
     }
-   
-}
 
+    /**
+     * Compara dos fechas sin considerar la hora.
+     * 
+     * @param fecha1 Primera fecha.
+     * @param fecha2 Segunda fecha.
+     * @return true si las fechas son iguales en año, mes y día.
+     */
+    private boolean mismasFechasSinHora(Date fecha1, Date fecha2) {
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(fecha1);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(fecha2);
+
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
+                && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
+                && cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
+    }
+}

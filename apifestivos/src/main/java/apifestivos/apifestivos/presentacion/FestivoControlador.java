@@ -1,6 +1,9 @@
 package apifestivos.apifestivos.presentacion;
 
-import java.util.Calendar;
+
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +25,7 @@ public class FestivoControlador {
 
     /**
      * Inyección de dependencias a través del constructor.
+     * 
      * @param festivoServicio Servicio de festivos para manejar la lógica de negocio.
      */
     public FestivoControlador(IFestivoServicio festivoServicio) {
@@ -30,6 +34,7 @@ public class FestivoControlador {
 
     /**
      * Endpoint para verificar si una fecha es festiva.
+     * 
      * @param anio Año de la fecha a verificar.
      * @param mes Mes de la fecha a verificar.
      * @param dia Día de la fecha a verificar.
@@ -37,19 +42,19 @@ public class FestivoControlador {
      */
     @GetMapping("/verificar/{anio}/{mes}/{dia}")
     public ResponseEntity<String> verificarFestivo(@PathVariable int anio, @PathVariable int mes,
-            @PathVariable int dia) {
+        @PathVariable int dia) {
         try {
-            if (mes < 1 || mes > 12 || dia < 1 || dia > 31) {
-                return ResponseEntity.ok("Fecha no válida");
-            }
-            // Crear una instancia de LocalDate con los valores de año, mes y día
-            Date fecha = new Date(anio - 1900, mes - 1, dia);
+            // Intentar crear una instancia de LocalDate con los valores proporcionados
+            LocalDate fechaLocalDate = LocalDate.of(anio, mes, dia);
+
+            // Convertir LocalDate a Date para usar con el servicio
+            Date fecha = Date.from(fechaLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
             // Verificar si es festivo usando el servicio
             String resultado = festivoServicio.verificarSiEsFestivo(fecha);
             return ResponseEntity.ok(resultado);
-        } catch (Exception e) {
-            // Capturar cualquier excepción que ocurra (por ejemplo, fechas inválidas)
+        } catch (DateTimeException e) {
+            // Capturar excepciones de fechas inválidas
             return ResponseEntity.ok("Fecha no válida");
         }
     }
