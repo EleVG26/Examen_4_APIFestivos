@@ -144,10 +144,16 @@ public class FestivoServicio implements IFestivoServicio {
                 break;
 
             case 4:
-                // Festivo basado en Pascua y que se traslada al siguiente lunes
+                // Festivo basado en Pascua y que se traslada al siguiente lunes si cae entre
+                // martes y domingo
                 fechaPascua = getDomingoDePascua(anio);
                 fechaFestivo = incrementarDias(fechaPascua, diasPascua);
-                fechaFestivo = siguienteLunes(fechaFestivo);
+                cal = Calendar.getInstance();
+                cal.setTime(fechaFestivo);
+                diaSemana = cal.get(Calendar.DAY_OF_WEEK);
+                if (diaSemana != Calendar.MONDAY) {
+                    fechaFestivo = siguienteLunes(fechaFestivo);
+                }
                 break;
 
             default:
