@@ -5,6 +5,8 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,6 +46,10 @@ public class FestivoControlador {
     public ResponseEntity<String> verificarFestivo(@PathVariable int anio, @PathVariable int mes,
         @PathVariable int dia) {
         try {
+            // Validar que el año esté entre 1983 y 9999
+            if (anio < 1983 || anio > 9999) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Año no válido. Debe estar entre 1983 y 9999");
+            }
             // Intentar crear una instancia de LocalDate con los valores proporcionados
             LocalDate fechaLocalDate = LocalDate.of(anio, mes, dia);
 

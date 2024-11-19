@@ -24,7 +24,8 @@ public class FestivoServicio implements IFestivoServicio {
     /**
      * Constructor que inyecta el repositorio de festivos.
      * 
-     * @param festivoRepositorio Repositorio para manejar la persistencia de los festivos.
+     * @param festivoRepositorio Repositorio para manejar la persistencia de los
+     *                           festivos.
      */
     public FestivoServicio(IFestivoRepositorio festivoRepositorio) {
         this.festivoRepositorio = festivoRepositorio;
@@ -34,7 +35,8 @@ public class FestivoServicio implements IFestivoServicio {
      * Verifica si una fecha determinada es un día festivo.
      * 
      * @param fecha Fecha a verificar.
-     * @return "Es Festivo" si la fecha corresponde a un día festivo, "No es festivo" si no, o "Fecha no válida" si la fecha es incorrecta.
+     * @return "Es Festivo" si la fecha corresponde a un día festivo, "No es
+     *         festivo" si no, o "Fecha no válida" si la fecha es incorrecta.
      */
     @Override
     public String verificarSiEsFestivo(Date fecha) {
@@ -108,10 +110,10 @@ public class FestivoServicio implements IFestivoServicio {
      * Calcula la fecha de un festivo según su tipo.
      * 
      * @param tipoFestivo Tipo de festivo (fijo, que se traslada, etc.).
-     * @param dia Día del mes del festivo.
-     * @param mes Mes del festivo.
-     * @param diasPascua Días desde Pascua (si aplica).
-     * @param anio Año del que se quiere calcular el festivo.
+     * @param dia         Día del mes del festivo.
+     * @param mes         Mes del festivo.
+     * @param diasPascua  Días desde Pascua (si aplica).
+     * @param anio        Año del que se quiere calcular el festivo.
      * @return Fecha del festivo calculada.
      */
     private Date calcularFechaFestivo(int tipoFestivo, Integer dia, Integer mes, Integer diasPascua, int anio) {
@@ -125,9 +127,14 @@ public class FestivoServicio implements IFestivoServicio {
                 break;
 
             case 2:
-                // Festivo fijo que se traslada al siguiente lunes (Ley de Puente Festivo)
+                // Festivo fijo que se traslada al siguiente lunes si cae entre martes y domingo
                 fechaFestivo = crearFecha(anio, mes, dia);
-                fechaFestivo = siguienteLunes(fechaFestivo);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(fechaFestivo);
+                int diaSemana = cal.get(Calendar.DAY_OF_WEEK);
+                if (diaSemana != Calendar.MONDAY) {
+                    fechaFestivo = siguienteLunes(fechaFestivo);
+                }
                 break;
 
             case 3:
